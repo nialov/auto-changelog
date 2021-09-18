@@ -130,6 +130,19 @@ def main(
         stopping_commit=stopping_commit,
     )
 
+    if isinstance(changelog, str):
+        split_lines = changelog.splitlines()
+        good_lines = []
+        remove = False
+        for line in split_lines:
+            if ("## " in line or "* " not in line) and len(line) > 0:
+                remove = False
+            if remove or any(f"#### {pattern}" in line for pattern in ("Refactorings", "Docs", "Others")):
+                remove = True
+            if not remove:
+                good_lines.append(line)
+        changelog = "\n".join(good_lines)
+
     if stdout:
         print(changelog)
     else:
